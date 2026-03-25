@@ -7,7 +7,7 @@ router.get("/", isAuthenticated, async (req, res) => {
     const entries = await Entry.find();
     res.json(entries);
   } catch (error) {
-    res.status(500).json({ message: "Error fetching entries" });
+    res.status(500).json({ messages: ["Error fetching entries"] });
   }
 });
 
@@ -21,10 +21,10 @@ router.get("/:date", isAuthenticated, async (req, res) => {
 
     const entry = await Entry.findOne({ date: { $gte: start, $lte: end } });
     if (!entry)
-      return res.status(404).json({ message: "No entry for this date" });
+      return res.status(404).json({ messages: ["No entry for this date"] });
     res.json(entry);
   } catch (error) {
-    res.status(500).json({ message: "Error fetching entry" });
+    res.status(500).json({ messages: ["Error fetching entry"] });
   }
 });
 
@@ -41,7 +41,7 @@ router.post("/", isAuthenticated, async (req, res) => {
     );
     res.status(201).json(entry);
   } catch (error) {
-    res.status(500).json({ message: "Error saving entry" });
+    res.status(500).json({ messages: ["Error saving entry"] });
   }
 });
 
@@ -52,7 +52,7 @@ router.patch("/:id", isAuthenticated, async (req, res) => {
     const entry = await Entry.findByIdAndUpdate(id, body, { new: true });
     res.json({ entry });
   } catch (error) {
-    res.status(500).json({ message: "Error saving entry" });
+    res.status(500).json({ messages: ["Error saving entry"] });
   }
 });
 
