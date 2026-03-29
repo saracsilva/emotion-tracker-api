@@ -27,16 +27,14 @@ const emotionSchema = new Schema(
 
 emotionSchema.index({ user: 1, name: 1 }, { unique: true });
 
-emotionSchema.pre("validate", function (next) {
+emotionSchema.pre("validate", async function () {
   if (this.isDefault && this.user) {
-    return next(new Error("Default emotions cannot belong to a user"));
+    throw new Error("Default emotions cannot belong to a user");
   }
 
   if (!this.isDefault && !this.user) {
-    return next(new Error("Custom emotions must belong to a user"));
+    throw new Error("Custom emotions must belong to a user");
   }
-
-  next();
 });
 
 module.exports = model("Emotion", emotionSchema);
