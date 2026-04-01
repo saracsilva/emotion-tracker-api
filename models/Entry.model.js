@@ -5,7 +5,6 @@ const entrySchema = new mongoose.Schema(
     date: {
       type: Date,
       required: true,
-      index: true,
     },
     user: {
       type: mongoose.Schema.Types.ObjectId,
