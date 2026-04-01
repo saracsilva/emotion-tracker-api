@@ -5,8 +5,12 @@ const entrySchema = new mongoose.Schema(
     date: {
       type: Date,
       required: true,
-      unique: true,
       index: true,
+    },
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
     },
     emotions: {
       type: [String],
