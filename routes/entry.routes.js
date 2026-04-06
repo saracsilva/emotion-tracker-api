@@ -12,6 +12,42 @@ router.get("/", isAuthenticated, async (req, res) => {
   }
 });
 
+router.get("/streak", isAuthenticated, async (req, res) => {
+  try {
+    const userId = req.payload.sub;
+    const entries = await Entry.find({
+      user: userId,
+      emotions: { $ne: [] },
+    })
+      .select("date")
+      .sort({ date: -1 });
+
+    let streak = 0;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    for (const entry of entries) {
+      const entryDate = new Date(entry.date);
+      entryDate.setHours(0, 0, 0, 0);
+
+      const MS_PER_DAY = 1000 * 60 * 60 * 24;
+      const diffDays = Math.round(
+        (today.getTime() - entryDate.getTime()) / MS_PER_DAY,
+      );
+
+      if (diffDays === streak) {
+        streak++;
+      } else {
+        break;
+      }
+    }
+
+    res.json({ streak });
+  } catch (error) {
+    res.status(500).json({ messages: ["Error fetching entry"] });
+  }
+});
+
 router.get("/:date", isAuthenticated, async (req, res) => {
   try {
     const { date } = req.params;
@@ -25,6 +61,7 @@ router.get("/:date", isAuthenticated, async (req, res) => {
       date: { $gte: start, $lte: end },
       user: userId,
     });
+
     if (!entry)
       return res.status(404).json({ messages: ["No entry for this date"] });
     res.json(entry);
