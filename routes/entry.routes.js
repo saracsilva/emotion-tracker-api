@@ -60,7 +60,7 @@ router.get("/:date", isAuthenticated, async (req, res) => {
     const entry = await Entry.findOne({
       date: { $gte: start, $lte: end },
       user: userId,
-    });
+    }).populate("emotions");
 
     if (!entry)
       return res.status(404).json({ messages: ["No entry for this date"] });

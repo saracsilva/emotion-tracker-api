@@ -12,7 +12,8 @@ const entrySchema = new mongoose.Schema(
       required: true,
     },
     emotions: {
-      type: [String],
+      type: [mongoose.Schema.Types.ObjectId],
+      ref: "Emotion",
       default: [],
     },
     reflection: {
