@@ -52,13 +52,13 @@ router.get("/:date", isAuthenticated, async (req, res) => {
   try {
     const { date } = req.params;
     const userId = req.payload.sub;
-    const start = new Date(date);
-    start.setHours(0, 0, 0, 0);
-    const end = new Date(date);
-    end.setHours(23, 59, 59, 999);
+
+    const start = new Date(`${date}T00:00:00.000Z`);
+    const end = new Date(`${date}T00:00:00.000Z`);
+    end.setDate(end.getDate() + 1);
 
     const entry = await Entry.findOne({
-      date: { $gte: start, $lte: end },
+      date: { $gte: start, $lt: end },
       user: userId,
     }).populate("emotions");
 
@@ -74,14 +74,15 @@ router.post("/", isAuthenticated, async (req, res) => {
   try {
     const { emotions, reflection, journal } = req.body;
     const userId = req.payload.sub;
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
 
-    const entry = await Entry.findOneAndUpdate(
-      { date: today, user: userId },
-      { $set: { emotions, reflection, journal } },
-      { upsert: true, returnDocument: "after" },
-    );
+    const entry = await Entry.create({
+      date: new Date(),
+      user: userId,
+      emotions,
+      reflection,
+      journal,
+    });
+
     res.status(201).json(entry);
   } catch (error) {
     res.status(500).json({ messages: ["Error saving entry"] });
